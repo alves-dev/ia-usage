@@ -1,0 +1,106 @@
+name: Create Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version, with or without leading v"
+        required: true
+        type: string
+      text:
+        description: "Release notes"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Create release from main
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Require main branch
+        if: github.ref != 'refs/heads/main'
+        run: |
+          echo "This workflow must be run from the main branch." >&2
+          exit 1
+
+      - name: Checkout main
+        uses: actions/checkout@v6
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Prepare release metadata
+        id: release
+        env:
+          VERSION_INPUT: ${{ inputs.version }}
+        run: |
+          version="${VERSION_INPUT#v}"
+
+          if [ -z "$version" ]; then
+            echo "Version is required." >&2
+            exit 1
+          fi
+
+          tag="v${version}"
+
+          if git rev-parse "$tag" >/dev/null 2>&1; then
+            echo "Local tag already exists: $tag" >&2
+            exit 1
+          fi
+
+          if git ls-remote --exit-code --tags origin "refs/tags/${tag}" >/dev/null 2>&1; then
+            echo "Remote tag already exists: $tag" >&2
+            exit 1
+          fi
+
+          {
+            echo "version=$version"
+            echo "tag=$tag"
+            echo "title=IA Usage $tag"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Update manifest version
+        env:
+          VERSION: ${{ steps.release.outputs.version }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          path = Path("custom_components/ia_usage/manifest.json")
+          data = json.loads(path.read_text())
+          data["version"] = os.environ["VERSION"]
+          path.write_text(json.dumps(data, indent=2) + "\n")
+          PY
+
+      - name: Commit manifest version
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+          if ! git diff --quiet -- custom_components/ia_usage/manifest.json; then
+            git add custom_components/ia_usage/manifest.json
+            git commit -m "chore: release ${{ steps.release.outputs.tag }}"
+            git push origin main
+          fi
+
+      - name: Create tag
+        run: |
+          git tag -a "${{ steps.release.outputs.tag }}" -m "${{ steps.release.outputs.title }}"
+          git push origin "${{ steps.release.outputs.tag }}"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.release.outputs.tag }}
+          name: ${{ steps.release.outputs.title }}
+          body: ${{ inputs.text }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
