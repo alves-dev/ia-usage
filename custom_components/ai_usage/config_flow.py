@@ -1,4 +1,4 @@
-"""Config flow for IA Usage."""
+"""Config flow for AI Usage."""
 
 from __future__ import annotations
 
@@ -13,8 +13,8 @@ from .const import CONF_WEBHOOK_ID, DOMAIN
 _WEBHOOK_ID_PATTERN = re.compile(r"^[A-Za-z0-9_-]{8,128}$")
 
 
-class IAUsageConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
-    """Handle an IA Usage config flow."""
+class AIUsageConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+    """Handle an AI Usage config flow."""
 
     VERSION = 1
 
@@ -34,7 +34,7 @@ class IAUsageConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 errors[CONF_WEBHOOK_ID] = "invalid_webhook_id"
             else:
                 return self.async_create_entry(
-                    title="IA Usage",
+                    title="AI Usage",
                     data={CONF_WEBHOOK_ID: webhook_id},
                 )
 

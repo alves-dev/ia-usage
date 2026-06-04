@@ -1,4 +1,4 @@
-"""Storage helpers for dynamic IA Usage accounts."""
+"""Storage helpers for dynamic AI Usage accounts."""
 
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ STORAGE_VERSION = 1
 STORAGE_KEY_PREFIX = f"{DOMAIN}.accounts"
 
 
-class IAUsageStorage:
+class AIUsageStorage:
     """Persist known provider accounts."""
 
     def __init__(self, hass: HomeAssistant, entry_id: str) -> None:

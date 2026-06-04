@@ -1,4 +1,4 @@
-"""Binary sensor platform for IA Usage."""
+"""Binary sensor platform for AI Usage."""
 
 from __future__ import annotations
 
@@ -31,29 +31,29 @@ from .const import (
     integration_update_signal,
 )
 from .models import AccountState, IntegrationState
-from .runtime import IAUsageRuntime
+from .runtime import AIUsageRuntime
 
 
 @dataclass(frozen=True, kw_only=True)
-class IAUsageIntegrationBinarySensorDescription(BinarySensorEntityDescription):
-    """Describes an integration-level IA Usage binary sensor."""
+class AIUsageIntegrationBinarySensorDescription(BinarySensorEntityDescription):
+    """Describes an integration-level AI Usage binary sensor."""
 
     value_fn: Callable[[IntegrationState], bool | None]
     attributes_fn: Callable[[IntegrationState], dict[str, Any]] = lambda _state: {}
 
 
 @dataclass(frozen=True, kw_only=True)
-class IAUsageAccountBinarySensorDescription(BinarySensorEntityDescription):
-    """Describes an account-level IA Usage binary sensor."""
+class AIUsageAccountBinarySensorDescription(BinarySensorEntityDescription):
+    """Describes an account-level AI Usage binary sensor."""
 
     value_fn: Callable[[AccountState], bool | None]
     attributes_fn: Callable[[AccountState], dict[str, Any]] = lambda _state: {}
 
 
 INTEGRATION_BINARY_SENSOR_DESCRIPTIONS: tuple[
-    IAUsageIntegrationBinarySensorDescription, ...
+    AIUsageIntegrationBinarySensorDescription, ...
 ] = (
-    IAUsageIntegrationBinarySensorDescription(
+    AIUsageIntegrationBinarySensorDescription(
         key="webhook_problem",
         name="Webhook problem",
         icon="mdi:webhook",
@@ -71,9 +71,9 @@ INTEGRATION_BINARY_SENSOR_DESCRIPTIONS: tuple[
 
 
 COMMON_ACCOUNT_BINARY_SENSOR_DESCRIPTIONS: tuple[
-    IAUsageAccountBinarySensorDescription, ...
+    AIUsageAccountBinarySensorDescription, ...
 ] = (
-    IAUsageAccountBinarySensorDescription(
+    AIUsageAccountBinarySensorDescription(
         key="problem",
         name="Problem",
         icon="mdi:alert-circle-outline",
@@ -95,8 +95,8 @@ COMMON_ACCOUNT_BINARY_SENSOR_DESCRIPTIONS: tuple[
 )
 
 
-CODEX_BINARY_SENSOR_DESCRIPTIONS: tuple[IAUsageAccountBinarySensorDescription, ...] = (
-    IAUsageAccountBinarySensorDescription(
+CODEX_BINARY_SENSOR_DESCRIPTIONS: tuple[AIUsageAccountBinarySensorDescription, ...] = (
+    AIUsageAccountBinarySensorDescription(
         key="allowed",
         name="Allowed",
         icon="mdi:check-decagram-outline",
@@ -117,7 +117,7 @@ CODEX_BINARY_SENSOR_DESCRIPTIONS: tuple[IAUsageAccountBinarySensorDescription, .
             }
         ),
     ),
-    IAUsageAccountBinarySensorDescription(
+    AIUsageAccountBinarySensorDescription(
         key="limit_reached",
         name="Limit reached",
         icon="mdi:speedometer-slow",
@@ -140,12 +140,12 @@ async def async_setup_entry(
     entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """Set up IA Usage binary sensors."""
-    runtime: IAUsageRuntime = hass.data[DOMAIN][entry.entry_id]
+    """Set up AI Usage binary sensors."""
+    runtime: AIUsageRuntime = hass.data[DOMAIN][entry.entry_id]
 
     async_add_entities(
         [
-            IAUsageIntegrationBinarySensor(entry, runtime, description)
+            AIUsageIntegrationBinarySensor(entry, runtime, description)
             for description in INTEGRATION_BINARY_SENSOR_DESCRIPTIONS
         ]
     )
@@ -160,7 +160,7 @@ async def async_setup_entry(
         added_accounts.add(key)
         async_add_entities(
             [
-                IAUsageAccountBinarySensor(entry, runtime, account, description)
+                AIUsageAccountBinarySensor(entry, runtime, account, description)
                 for description in _account_binary_sensor_descriptions(account.provider)
             ]
         )
@@ -175,19 +175,19 @@ async def async_setup_entry(
         _add_account_binary_sensors(account)
 
 
-class IAUsageIntegrationBinarySensor(BinarySensorEntity):
-    """Representation of an integration-level IA Usage binary sensor."""
+class AIUsageIntegrationBinarySensor(BinarySensorEntity):
+    """Representation of an integration-level AI Usage binary sensor."""
 
     _attr_has_entity_name = True
     _attr_should_poll = False
 
-    entity_description: IAUsageIntegrationBinarySensorDescription
+    entity_description: AIUsageIntegrationBinarySensorDescription
 
     def __init__(
         self,
         entry: ConfigEntry,
-        runtime: IAUsageRuntime,
-        description: IAUsageIntegrationBinarySensorDescription,
+        runtime: AIUsageRuntime,
+        description: AIUsageIntegrationBinarySensorDescription,
     ) -> None:
         """Initialize the binary sensor."""
         self.entity_description = description
@@ -225,20 +225,20 @@ class IAUsageIntegrationBinarySensor(BinarySensorEntity):
         self.async_write_ha_state()
 
 
-class IAUsageAccountBinarySensor(BinarySensorEntity, RestoreEntity):
+class AIUsageAccountBinarySensor(BinarySensorEntity, RestoreEntity):
     """Representation of a dynamic provider account binary sensor."""
 
     _attr_has_entity_name = True
     _attr_should_poll = False
 
-    entity_description: IAUsageAccountBinarySensorDescription
+    entity_description: AIUsageAccountBinarySensorDescription
 
     def __init__(
         self,
         entry: ConfigEntry,
-        runtime: IAUsageRuntime,
+        runtime: AIUsageRuntime,
         account: AccountState,
-        description: IAUsageAccountBinarySensorDescription,
+        description: AIUsageAccountBinarySensorDescription,
     ) -> None:
         """Initialize the binary sensor."""
         self.entity_description = description
@@ -309,7 +309,7 @@ class IAUsageAccountBinarySensor(BinarySensorEntity, RestoreEntity):
 
 def _account_binary_sensor_descriptions(
     provider: str,
-) -> tuple[IAUsageAccountBinarySensorDescription, ...]:
+) -> tuple[AIUsageAccountBinarySensorDescription, ...]:
     """Return all binary sensor descriptions for a provider account."""
     provider_keys = set(PROVIDER_BINARY_SENSOR_KEYS.get(provider, ()))
     provider_descriptions = tuple(
@@ -334,7 +334,7 @@ def _integration_device_info(entry: ConfigEntry) -> DeviceInfo:
 
 def _account_device_info(
     entry: ConfigEntry,
-    runtime: IAUsageRuntime,
+    runtime: AIUsageRuntime,
     account: AccountState,
 ) -> DeviceInfo:
     """Return DeviceInfo for a provider account device."""

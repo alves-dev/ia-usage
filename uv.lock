@@ -989,7 +989,7 @@ wheels = [
 ]
 
 [[package]]
-name = "ia-usage"
+name = "ai-usage"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [

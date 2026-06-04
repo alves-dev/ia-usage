@@ -1,4 +1,4 @@
-"""Tests for IA Usage payload contract validation."""
+"""Tests for AI Usage payload contract validation."""
 
 from __future__ import annotations
 
@@ -8,13 +8,13 @@ from typing import Any
 from conftest import clone_payload
 import pytest
 
-from custom_components.ia_usage.const import (
+from custom_components.ai_usage.const import (
     INGEST_STATUS_INVALID_CONTRACT,
     INGEST_STATUS_MISSING_PROVIDER,
     INGEST_STATUS_PAYLOAD_MUST_BE_OBJECT,
     INGEST_STATUS_UNSUPPORTED_PROVIDER,
 )
-from custom_components.ia_usage.validation import (
+from custom_components.ai_usage.validation import (
     PayloadValidationError,
     validate_payload,
 )

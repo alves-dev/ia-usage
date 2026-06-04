@@ -1,4 +1,4 @@
-"""Reusable payload ingestion service for IA Usage."""
+"""Reusable payload ingestion service for AI Usage."""
 
 from __future__ import annotations
 
@@ -17,15 +17,15 @@ from .models import IngestContext, IngestResult
 from .validation import PayloadValidationError, validate_payload
 
 if TYPE_CHECKING:
-    from .runtime import IAUsageRuntime
+    from .runtime import AIUsageRuntime
 
 _LOGGER = logging.getLogger(__name__)
 
 
-class IAUsageIngestionService:
+class AIUsageIngestionService:
     """Validate payloads and apply them to runtime state."""
 
-    def __init__(self, runtime: IAUsageRuntime) -> None:
+    def __init__(self, runtime: AIUsageRuntime) -> None:
         """Initialize the ingestion service."""
         self._runtime = runtime
 
@@ -58,7 +58,7 @@ class IAUsageIngestionService:
             await self._runtime.async_record_ingest_result(result, ingest_context)
             return result
         except Exception as err:
-            _LOGGER.exception("Unexpected IA Usage payload validation failure")
+            _LOGGER.exception("Unexpected AI Usage payload validation failure")
             result = IngestResult(
                 ok=False,
                 http_status=HTTPStatus.INTERNAL_SERVER_ERROR,
@@ -104,7 +104,7 @@ class IAUsageIngestionService:
                 ingest_context,
             )
         except Exception as err:
-            _LOGGER.exception("Unexpected IA Usage account update failure")
+            _LOGGER.exception("Unexpected AI Usage account update failure")
             result = IngestResult(
                 ok=False,
                 http_status=HTTPStatus.INTERNAL_SERVER_ERROR,

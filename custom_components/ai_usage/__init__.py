@@ -1,4 +1,4 @@
-"""IA Usage custom integration."""
+"""AI Usage custom integration."""
 
 from __future__ import annotations
 
@@ -10,14 +10,14 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
 from .const import CONF_WEBHOOK_ID, DOMAIN, PLATFORMS
-from .runtime import IAUsageRuntime
+from .runtime import AIUsageRuntime
 
 _LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Set up IA Usage from a config entry."""
-    runtime = IAUsageRuntime(hass, entry)
+    """Set up AI Usage from a config entry."""
+    runtime = AIUsageRuntime(hass, entry)
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = runtime
 
     webhook_id = entry.data[CONF_WEBHOOK_ID]
@@ -34,7 +34,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             allowed_methods=(METH_POST,),
         )
         webhook_registered = True
-        _LOGGER.debug("Registered IA Usage webhook %s", webhook_id)
+        _LOGGER.debug("Registered AI Usage webhook %s", webhook_id)
 
         await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     except Exception:
@@ -48,7 +48,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Unload IA Usage."""
+    """Unload AI Usage."""
     unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
     if unload_ok:
         webhook.async_unregister(hass, entry.data[CONF_WEBHOOK_ID])

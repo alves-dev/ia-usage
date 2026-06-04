@@ -1,10 +1,10 @@
-"""Tests for IA Usage account identity resolution."""
+"""Tests for AI Usage account identity resolution."""
 
 from __future__ import annotations
 
 import hashlib
 
-from custom_components.ia_usage.identity import (
+from custom_components.ai_usage.identity import (
     normalize_email,
     resolve_account_identity,
 )

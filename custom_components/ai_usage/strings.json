@@ -1,9 +1,9 @@
 {
-  "title": "IA Usage",
+  "title": "AI Usage",
   "config": {
     "step": {
       "user": {
-        "title": "IA Usage webhook",
+        "title": "AI Usage webhook",
         "description": "Configure the endpoint ID used by /api/webhook/{webhook_id}. Keep this value hard to guess.",
         "data": {
           "webhook_id": "Webhook endpoint ID"
@@ -13,7 +13,7 @@
         }
       },
       "reconfigure": {
-        "title": "Reconfigure IA Usage webhook",
+        "title": "Reconfigure AI Usage webhook",
         "description": "Update the endpoint ID used by /api/webhook/{webhook_id}.",
         "data": {
           "webhook_id": "Webhook endpoint ID"
@@ -27,7 +27,7 @@
       "invalid_webhook_id": "Use 8 to 128 characters containing only letters, numbers, underscores, or hyphens."
     },
     "abort": {
-      "already_configured": "IA Usage is already configured."
+      "already_configured": "AI Usage is already configured."
     }
   }
 }

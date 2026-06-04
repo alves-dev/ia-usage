@@ -1,4 +1,4 @@
-"""Models used by the IA Usage integration."""
+"""Models used by the AI Usage integration."""
 
 from __future__ import annotations
 

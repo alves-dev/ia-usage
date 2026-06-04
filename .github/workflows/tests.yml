@@ -32,7 +32,7 @@ jobs:
         run: uv sync --all-groups --frozen
 
       - name: Run Ruff
-        run: uv run ruff check custom_components/ia_usage tests
+        run: uv run ruff check custom_components/ai_usage tests
 
       - name: Run pytest
         run: uv run pytest

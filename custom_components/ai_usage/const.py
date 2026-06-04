@@ -1,11 +1,11 @@
-"""Constants for the IA Usage integration."""
+"""Constants for the AI Usage integration."""
 
 from __future__ import annotations
 
 from homeassistant.const import Platform
 
-DOMAIN = "ia_usage"
-INTEGRATION_NAME = "IA Usage"
+DOMAIN = "ai_usage"
+INTEGRATION_NAME = "AI Usage"
 INTEGRATION_VERSION = "0.0.1"
 
 CONF_WEBHOOK_ID = "webhook_id"

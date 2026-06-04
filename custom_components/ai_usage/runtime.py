@@ -1,4 +1,4 @@
-"""Runtime state and webhook transport for IA Usage."""
+"""Runtime state and webhook transport for AI Usage."""
 
 from __future__ import annotations
 
@@ -23,7 +23,7 @@ from .const import (
     provider_update_signal,
 )
 from .images import async_register_provider_static_paths, provider_entity_picture
-from .ingestion import IAUsageIngestionService
+from .ingestion import AIUsageIngestionService
 from .models import (
     AccountIdentity,
     AccountState,
@@ -34,14 +34,14 @@ from .models import (
     ProviderMetadata,
 )
 from .providers import PROVIDER_HANDLERS
-from .storage import IAUsageStorage
+from .storage import AIUsageStorage
 
 _LOGGER = logging.getLogger(__name__)
 
 AccountCallback = Callable[[AccountState], None]
 
 
-class IAUsageRuntime:
+class AIUsageRuntime:
     """Hold runtime state and process webhook requests."""
 
     def __init__(self, hass: HomeAssistant, entry: ConfigEntry) -> None:
@@ -50,8 +50,8 @@ class IAUsageRuntime:
         self.entry = entry
         self.integration_state = IntegrationState()
         self.accounts: dict[tuple[str, str], AccountState] = {}
-        self.ingestion_service = IAUsageIngestionService(self)
-        self._storage = IAUsageStorage(hass, entry.entry_id)
+        self.ingestion_service = AIUsageIngestionService(self)
+        self._storage = AIUsageStorage(hass, entry.entry_id)
         self._account_sensor_callbacks: list[AccountCallback] = []
         self._account_binary_sensor_callbacks: list[AccountCallback] = []
 
@@ -235,7 +235,7 @@ class IAUsageRuntime:
         try:
             payload: Any = await request.json()
         except Exception as err:
-            _LOGGER.warning("Invalid IA Usage webhook JSON on %s: %s", webhook_id, err)
+            _LOGGER.warning("Invalid AI Usage webhook JSON on %s: %s", webhook_id, err)
             result = IngestResult(
                 ok=False,
                 http_status=HTTPStatus.BAD_REQUEST,

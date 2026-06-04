@@ -1,4 +1,4 @@
-"""Tests for IA Usage ingestion service."""
+"""Tests for AI Usage ingestion service."""
 
 from __future__ import annotations
 
@@ -9,13 +9,13 @@ from typing import Any
 from conftest import clone_payload
 import pytest
 
-from custom_components.ia_usage.const import (
+from custom_components.ai_usage.const import (
     INGEST_STATUS_ACCOUNT_UNIDENTIFIED,
     INGEST_STATUS_INVALID_CONTRACT,
     INGEST_STATUS_OK,
 )
-from custom_components.ia_usage.ingestion import IAUsageIngestionService
-from custom_components.ia_usage.models import (
+from custom_components.ai_usage.ingestion import AIUsageIngestionService
+from custom_components.ai_usage.models import (
     AccountIdentity,
     IngestContext,
     IngestResult,
@@ -80,7 +80,7 @@ async def test_ingest_valid_codex_payload(
 ) -> None:
     """A valid account payload should be applied and recorded as ok."""
     runtime = FakeRuntime()
-    service = IAUsageIngestionService(runtime)  # type: ignore[arg-type]
+    service = AIUsageIngestionService(runtime)  # type: ignore[arg-type]
 
     result = await service.async_ingest_payload(
         codex_payload,
@@ -116,7 +116,7 @@ async def test_ingest_valid_payload_with_webhook_context(
 ) -> None:
     """Webhook-specific context should be captured without being required."""
     runtime = FakeRuntime()
-    service = IAUsageIngestionService(runtime)  # type: ignore[arg-type]
+    service = AIUsageIngestionService(runtime)  # type: ignore[arg-type]
 
     result = await service.async_ingest_payload(
         ollama_payload,
@@ -140,7 +140,7 @@ async def test_invalid_contract_is_recorded(
 ) -> None:
     """Invalid contracts should not apply account samples."""
     runtime = FakeRuntime()
-    service = IAUsageIngestionService(runtime)  # type: ignore[arg-type]
+    service = AIUsageIngestionService(runtime)  # type: ignore[arg-type]
     payload = clone_payload(codex_payload)
     payload["account_data"] = []
 
@@ -166,7 +166,7 @@ async def test_payload_without_identity_updates_unscoped_error(
 ) -> None:
     """Valid payloads without identity should update unscoped error state."""
     runtime = FakeRuntime()
-    service = IAUsageIngestionService(runtime)  # type: ignore[arg-type]
+    service = AIUsageIngestionService(runtime)  # type: ignore[arg-type]
 
     result = await service.async_ingest_payload(
         error_payload,

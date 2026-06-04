@@ -1,5 +1,5 @@
 [project]
-name = "ia-usage"
+name = "ai-usage"
 version = "0.1.0"
 description = "Home Assistant custom integration for AI usage telemetry"
 requires-python = ">=3.14.2"

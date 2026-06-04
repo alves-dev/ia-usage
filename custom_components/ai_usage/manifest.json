@@ -1,6 +1,6 @@
 {
-  "domain": "ia_usage",
-  "name": "IA Usage",
+  "domain": "ai_usage",
+  "name": "AI Usage",
   "codeowners": [
     "@alves-dev"
   ],
@@ -9,9 +9,9 @@
     "http",
     "webhook"
   ],
-  "documentation": "https://github.com/alves-dev/ia-usage",
+  "documentation": "https://github.com/alves-dev/ai-usage",
   "iot_class": "cloud_push",
-  "issue_tracker": "https://github.com/alves-dev/ia-usage/issues",
+  "issue_tracker": "https://github.com/alves-dev/ai-usage/issues",
   "requirements": [],
   "version": "0.0.1"
 }

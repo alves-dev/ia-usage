@@ -1,4 +1,4 @@
-"""Shared test fixtures for IA Usage."""
+"""Shared test fixtures for AI Usage."""
 
 from __future__ import annotations
 

@@ -1,4 +1,4 @@
-# IA Usage
+# AI Usage
 
 Home Assistant custom integration for tracking AI service usage from external
 collectors.
@@ -14,7 +14,7 @@ Supported providers in the current version:
 
 ## What It Does
 
-IA Usage is a webhook collector. It does not scrape provider pages by itself.
+AI Usage is a webhook collector. It does not scrape provider pages by itself.
 Another source, such as a browser extension, shell script, or manual test, sends
 payloads to Home Assistant using the contract documented in
 [docs/payload-contract.md](docs/payload-contract.md).
@@ -40,7 +40,7 @@ Collector / script / extension
 Home Assistant webhook adapter
         |
         v
-IAUsageIngestionService
+AIUsageIngestionService
         |
         +--> payload validation
         +--> provider validation
@@ -54,14 +54,14 @@ Sensors and binary sensors
 ```
 
 The webhook is intentionally thin. Business logic lives in
-`IAUsageIngestionService`, so future collectors can call the same ingestion
+`AIUsageIngestionService`, so future collectors can call the same ingestion
 service without creating an artificial HTTP request.
 
 ## Devices
 
 ### Source Webhook
 
-The parent device represents the configured IA Usage webhook source.
+The parent device represents the configured AI Usage webhook source.
 
 It contains integration-level diagnostics:
 
@@ -109,16 +109,16 @@ Provider-specific entities:
 
 ## Installation
 
-Copy `custom_components/ia_usage` into your Home Assistant config directory:
+Copy `custom_components/ai_usage` into your Home Assistant config directory:
 
 ```text
-config/custom_components/ia_usage
+config/custom_components/ai_usage
 ```
 
 Restart Home Assistant, then add the integration:
 
 ```text
-Settings > Devices & services > Add Integration > IA Usage
+Settings > Devices & services > Add Integration > AI Usage
 ```
 
 During setup, choose the `Webhook endpoint ID`.
@@ -329,7 +329,7 @@ uv sync --all-groups
 Run lint:
 
 ```bash
-uv run ruff check custom_components/ia_usage tests
+uv run ruff check custom_components/ai_usage tests
 ```
 
 Run tests:
@@ -353,7 +353,7 @@ requests:
 
 ```bash
 uv sync --all-groups --frozen
-uv run ruff check custom_components/ia_usage tests
+uv run ruff check custom_components/ai_usage tests
 uv run pytest
 ```
 

@@ -1,4 +1,4 @@
-"""Account identity resolution for IA Usage."""
+"""Account identity resolution for AI Usage."""
 
 from __future__ import annotations
 

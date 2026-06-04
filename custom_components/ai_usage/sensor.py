@@ -1,4 +1,4 @@
-"""Sensor platform for IA Usage."""
+"""Sensor platform for AI Usage."""
 
 from __future__ import annotations
 
@@ -37,27 +37,27 @@ from .const import (
 )
 from .models import AccountState, IntegrationState
 from .providers.base import parse_datetime
-from .runtime import IAUsageRuntime
+from .runtime import AIUsageRuntime
 
 
 @dataclass(frozen=True, kw_only=True)
-class IAUsageIntegrationSensorDescription(SensorEntityDescription):
-    """Describes an integration-level IA Usage sensor."""
+class AIUsageIntegrationSensorDescription(SensorEntityDescription):
+    """Describes an integration-level AI Usage sensor."""
 
     value_fn: Callable[[IntegrationState], Any]
     attributes_fn: Callable[[IntegrationState], dict[str, Any]] = lambda _state: {}
 
 
 @dataclass(frozen=True, kw_only=True)
-class IAUsageAccountSensorDescription(SensorEntityDescription):
-    """Describes an account-level IA Usage sensor."""
+class AIUsageAccountSensorDescription(SensorEntityDescription):
+    """Describes an account-level AI Usage sensor."""
 
     value_fn: Callable[[AccountState], Any]
     attributes_fn: Callable[[AccountState], dict[str, Any]] = lambda _state: {}
 
 
-INTEGRATION_SENSOR_DESCRIPTIONS: tuple[IAUsageIntegrationSensorDescription, ...] = (
-    IAUsageIntegrationSensorDescription(
+INTEGRATION_SENSOR_DESCRIPTIONS: tuple[AIUsageIntegrationSensorDescription, ...] = (
+    AIUsageIntegrationSensorDescription(
         key="last_ingest_status",
         name="Last ingest status",
         icon="mdi:check-network-outline",
@@ -72,7 +72,7 @@ INTEGRATION_SENSOR_DESCRIPTIONS: tuple[IAUsageIntegrationSensorDescription, ...]
             }
         ),
     ),
-    IAUsageIntegrationSensorDescription(
+    AIUsageIntegrationSensorDescription(
         key="last_webhook_received_at",
         name="Last webhook received at",
         icon="mdi:webhook",
@@ -83,7 +83,7 @@ INTEGRATION_SENSOR_DESCRIPTIONS: tuple[IAUsageIntegrationSensorDescription, ...]
             "last_ingest_status": state.last_ingest_status,
         },
     ),
-    IAUsageIntegrationSensorDescription(
+    AIUsageIntegrationSensorDescription(
         key="last_source",
         name="Last source",
         icon="mdi:source-branch",
@@ -100,7 +100,7 @@ INTEGRATION_SENSOR_DESCRIPTIONS: tuple[IAUsageIntegrationSensorDescription, ...]
             }
         ),
     ),
-    IAUsageIntegrationSensorDescription(
+    AIUsageIntegrationSensorDescription(
         key="known_accounts",
         name="Known accounts",
         entity_category=EntityCategory.DIAGNOSTIC,
@@ -111,7 +111,7 @@ INTEGRATION_SENSOR_DESCRIPTIONS: tuple[IAUsageIntegrationSensorDescription, ...]
             "providers": dict(state.known_accounts_by_provider),
         },
     ),
-    IAUsageIntegrationSensorDescription(
+    AIUsageIntegrationSensorDescription(
         key="last_unscoped_error",
         name="Last unscoped error",
         icon="mdi:alert-circle-outline",
@@ -131,8 +131,8 @@ INTEGRATION_SENSOR_DESCRIPTIONS: tuple[IAUsageIntegrationSensorDescription, ...]
 )
 
 
-COMMON_ACCOUNT_SENSOR_DESCRIPTIONS: tuple[IAUsageAccountSensorDescription, ...] = (
-    IAUsageAccountSensorDescription(
+COMMON_ACCOUNT_SENSOR_DESCRIPTIONS: tuple[AIUsageAccountSensorDescription, ...] = (
+    AIUsageAccountSensorDescription(
         key="account",
         name="Account",
         icon="mdi:account-circle-outline",
@@ -140,7 +140,7 @@ COMMON_ACCOUNT_SENSOR_DESCRIPTIONS: tuple[IAUsageAccountSensorDescription, ...] 
         value_fn=lambda state: _account_value(state),  # noqa: PLW0108
         attributes_fn=lambda state: _account_attributes(state),  # noqa: PLW0108
     ),
-    IAUsageAccountSensorDescription(
+    AIUsageAccountSensorDescription(
         key="plan",
         name="Plan",
         icon="mdi:card-account-details-outline",
@@ -149,7 +149,7 @@ COMMON_ACCOUNT_SENSOR_DESCRIPTIONS: tuple[IAUsageAccountSensorDescription, ...] 
         value_fn=lambda state: _mapping_str(state.plan_data, "type"),
         attributes_fn=lambda state: {"plan_data": dict(state.plan_data)},
     ),
-    IAUsageAccountSensorDescription(
+    AIUsageAccountSensorDescription(
         key="status",
         name="Status",
         icon="mdi:list-status",
@@ -164,7 +164,7 @@ COMMON_ACCOUNT_SENSOR_DESCRIPTIONS: tuple[IAUsageAccountSensorDescription, ...] 
             }
         ),
     ),
-    IAUsageAccountSensorDescription(
+    AIUsageAccountSensorDescription(
         key="last_error",
         name="Last error",
         icon="mdi:alert-outline",
@@ -181,7 +181,7 @@ COMMON_ACCOUNT_SENSOR_DESCRIPTIONS: tuple[IAUsageAccountSensorDescription, ...] 
             }
         ),
     ),
-    IAUsageAccountSensorDescription(
+    AIUsageAccountSensorDescription(
         key="collected_at",
         name="Collected at",
         icon="mdi:clock-edit-outline",
@@ -190,7 +190,7 @@ COMMON_ACCOUNT_SENSOR_DESCRIPTIONS: tuple[IAUsageAccountSensorDescription, ...] 
         value_fn=lambda state: state.collected_at,
         attributes_fn=lambda state: _drop_none({"source": state.source}),
     ),
-    IAUsageAccountSensorDescription(
+    AIUsageAccountSensorDescription(
         key="last_received_at",
         name="Last received at",
         icon="mdi:clock-in",
@@ -201,7 +201,7 @@ COMMON_ACCOUNT_SENSOR_DESCRIPTIONS: tuple[IAUsageAccountSensorDescription, ...] 
             {"collected_at": _iso(state.collected_at)}
         ),
     ),
-    IAUsageAccountSensorDescription(
+    AIUsageAccountSensorDescription(
         key="source",
         name="Source",
         icon="mdi:cloud-upload-outline",
@@ -216,7 +216,7 @@ COMMON_ACCOUNT_SENSOR_DESCRIPTIONS: tuple[IAUsageAccountSensorDescription, ...] 
             }
         ),
     ),
-    IAUsageAccountSensorDescription(
+    AIUsageAccountSensorDescription(
         key="request_count",
         name="Request count",
         entity_category=EntityCategory.DIAGNOSTIC,
@@ -229,8 +229,8 @@ COMMON_ACCOUNT_SENSOR_DESCRIPTIONS: tuple[IAUsageAccountSensorDescription, ...] 
 )
 
 
-CODEX_SENSOR_DESCRIPTIONS: tuple[IAUsageAccountSensorDescription, ...] = (
-    IAUsageAccountSensorDescription(
+CODEX_SENSOR_DESCRIPTIONS: tuple[AIUsageAccountSensorDescription, ...] = (
+    AIUsageAccountSensorDescription(
         key="primary_window_used_percent",
         name="Primary window used",
         icon="mdi:gauge",
@@ -244,7 +244,7 @@ CODEX_SENSOR_DESCRIPTIONS: tuple[IAUsageAccountSensorDescription, ...] = (
         ),
         attributes_fn=lambda state: _codex_used_attributes(state, "primary_window"),
     ),
-    IAUsageAccountSensorDescription(
+    AIUsageAccountSensorDescription(
         key="primary_window_reset_at",
         name="Primary window reset at",
         icon="mdi:calendar-clock",
@@ -269,7 +269,7 @@ CODEX_SENSOR_DESCRIPTIONS: tuple[IAUsageAccountSensorDescription, ...] = (
             }
         ),
     ),
-    IAUsageAccountSensorDescription(
+    AIUsageAccountSensorDescription(
         key="primary_window_reset_after",
         name="Primary window reset after",
         icon="mdi:timer-sand",
@@ -288,7 +288,7 @@ CODEX_SENSOR_DESCRIPTIONS: tuple[IAUsageAccountSensorDescription, ...] = (
             }
         ),
     ),
-    IAUsageAccountSensorDescription(
+    AIUsageAccountSensorDescription(
         key="secondary_window_used_percent",
         name="Secondary window used",
         icon="mdi:gauge-low",
@@ -302,7 +302,7 @@ CODEX_SENSOR_DESCRIPTIONS: tuple[IAUsageAccountSensorDescription, ...] = (
         ),
         attributes_fn=lambda state: _codex_used_attributes(state, "secondary_window"),
     ),
-    IAUsageAccountSensorDescription(
+    AIUsageAccountSensorDescription(
         key="secondary_window_reset_at",
         name="Secondary window reset at",
         icon="mdi:calendar-refresh-outline",
@@ -327,7 +327,7 @@ CODEX_SENSOR_DESCRIPTIONS: tuple[IAUsageAccountSensorDescription, ...] = (
             }
         ),
     ),
-    IAUsageAccountSensorDescription(
+    AIUsageAccountSensorDescription(
         key="secondary_window_reset_after",
         name="Secondary window reset after",
         icon="mdi:timer-sand-complete",
@@ -349,8 +349,8 @@ CODEX_SENSOR_DESCRIPTIONS: tuple[IAUsageAccountSensorDescription, ...] = (
 )
 
 
-OLLAMA_CLOUD_SENSOR_DESCRIPTIONS: tuple[IAUsageAccountSensorDescription, ...] = (
-    IAUsageAccountSensorDescription(
+OLLAMA_CLOUD_SENSOR_DESCRIPTIONS: tuple[AIUsageAccountSensorDescription, ...] = (
+    AIUsageAccountSensorDescription(
         key="session_usage_used_percent",
         name="Session usage used",
         icon="mdi:speedometer",
@@ -364,7 +364,7 @@ OLLAMA_CLOUD_SENSOR_DESCRIPTIONS: tuple[IAUsageAccountSensorDescription, ...] = 
         ),
         attributes_fn=lambda state: _ollama_used_attributes(state, "session_usage"),
     ),
-    IAUsageAccountSensorDescription(
+    AIUsageAccountSensorDescription(
         key="session_usage_reset_at",
         name="Session usage reset at",
         icon="mdi:calendar-clock",
@@ -385,7 +385,7 @@ OLLAMA_CLOUD_SENSOR_DESCRIPTIONS: tuple[IAUsageAccountSensorDescription, ...] = 
             }
         ),
     ),
-    IAUsageAccountSensorDescription(
+    AIUsageAccountSensorDescription(
         key="weekly_usage_used_percent",
         name="Weekly usage used",
         icon="mdi:chart-donut",
@@ -399,7 +399,7 @@ OLLAMA_CLOUD_SENSOR_DESCRIPTIONS: tuple[IAUsageAccountSensorDescription, ...] = 
         ),
         attributes_fn=lambda state: _ollama_used_attributes(state, "weekly_usage"),
     ),
-    IAUsageAccountSensorDescription(
+    AIUsageAccountSensorDescription(
         key="weekly_usage_reset_at",
         name="Weekly usage reset at",
         icon="mdi:calendar-week",
@@ -433,12 +433,12 @@ async def async_setup_entry(
     entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """Set up IA Usage sensors."""
-    runtime: IAUsageRuntime = hass.data[DOMAIN][entry.entry_id]
+    """Set up AI Usage sensors."""
+    runtime: AIUsageRuntime = hass.data[DOMAIN][entry.entry_id]
 
     async_add_entities(
         [
-            IAUsageIntegrationSensor(entry, runtime, description)
+            AIUsageIntegrationSensor(entry, runtime, description)
             for description in INTEGRATION_SENSOR_DESCRIPTIONS
         ]
     )
@@ -453,7 +453,7 @@ async def async_setup_entry(
         added_accounts.add(key)
         async_add_entities(
             [
-                IAUsageAccountSensor(entry, runtime, account, description)
+                AIUsageAccountSensor(entry, runtime, account, description)
                 for description in _account_sensor_descriptions(account.provider)
             ]
         )
@@ -466,19 +466,19 @@ async def async_setup_entry(
         _add_account_sensors(account)
 
 
-class IAUsageIntegrationSensor(SensorEntity):
-    """Representation of an integration-level IA Usage sensor."""
+class AIUsageIntegrationSensor(SensorEntity):
+    """Representation of an integration-level AI Usage sensor."""
 
     _attr_has_entity_name = True
     _attr_should_poll = False
 
-    entity_description: IAUsageIntegrationSensorDescription
+    entity_description: AIUsageIntegrationSensorDescription
 
     def __init__(
         self,
         entry: ConfigEntry,
-        runtime: IAUsageRuntime,
-        description: IAUsageIntegrationSensorDescription,
+        runtime: AIUsageRuntime,
+        description: AIUsageIntegrationSensorDescription,
     ) -> None:
         """Initialize the sensor."""
         self.entity_description = description
@@ -519,20 +519,20 @@ class IAUsageIntegrationSensor(SensorEntity):
         self.async_write_ha_state()
 
 
-class IAUsageAccountSensor(SensorEntity, RestoreEntity):
+class AIUsageAccountSensor(SensorEntity, RestoreEntity):
     """Representation of a dynamic provider account sensor."""
 
     _attr_has_entity_name = True
     _attr_should_poll = False
 
-    entity_description: IAUsageAccountSensorDescription
+    entity_description: AIUsageAccountSensorDescription
 
     def __init__(
         self,
         entry: ConfigEntry,
-        runtime: IAUsageRuntime,
+        runtime: AIUsageRuntime,
         account: AccountState,
-        description: IAUsageAccountSensorDescription,
+        description: AIUsageAccountSensorDescription,
     ) -> None:
         """Initialize the sensor."""
         self.entity_description = description
@@ -613,7 +613,7 @@ class IAUsageAccountSensor(SensorEntity, RestoreEntity):
 
 def _account_sensor_descriptions(
     provider: str,
-) -> tuple[IAUsageAccountSensorDescription, ...]:
+) -> tuple[AIUsageAccountSensorDescription, ...]:
     """Return all sensor descriptions for a provider account."""
     provider_keys = set(PROVIDER_SENSOR_KEYS.get(provider, ()))
     provider_descriptions = tuple(
@@ -638,7 +638,7 @@ def _integration_device_info(entry: ConfigEntry) -> DeviceInfo:
 
 def _account_device_info(
     entry: ConfigEntry,
-    runtime: IAUsageRuntime,
+    runtime: AIUsageRuntime,
     account: AccountState,
 ) -> DeviceInfo:
     """Return DeviceInfo for a provider account device."""
@@ -803,7 +803,7 @@ def _drop_none(data: dict[str, Any]) -> dict[str, Any]:
 
 
 def _restore_native_value(
-    description: IAUsageAccountSensorDescription,
+    description: AIUsageAccountSensorDescription,
     state: str,
 ) -> Any:
     """Convert a restored HA state string into a sensor native value."""

@@ -11,7 +11,7 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Added
 
-- Initial HACS-ready release of IA Usage.
+- Initial HACS-ready release of AI Usage.
 - Added Home Assistant webhook ingestion for normalized AI usage payloads.
 - Added support for Codex usage payloads.
 - Added support for Ollama Cloud usage payloads.

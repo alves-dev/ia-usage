@@ -1,4 +1,4 @@
-"""Payload contract validation for IA Usage."""
+"""Payload contract validation for AI Usage."""
 
 from __future__ import annotations
 
