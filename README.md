@@ -1,388 +1,180 @@
 # AI Usage
 
-Home Assistant custom integration for tracking AI service usage from external
-collectors.
+<p align="center">
+  <img src="https://raw.githubusercontent.com/alves-dev/ai-usage/main/custom_components/ai_usage/brand/ai_usage_v5_512.png" alt="AI Usage" width="128">
+</p>
 
-The integration receives normalized payloads through a Home Assistant webhook,
-validates the payload contract, identifies the provider account, and exposes
-diagnostic and usage entities for dashboards and automations.
+<p align="center">
+  <strong>Track AI service usage inside Home Assistant.</strong>
+</p>
 
-Supported providers in the current version:
+<p align="center">
+  <a href="/hacs/repository/1255408258">
+    <img alt="Open in HACS" src="https://img.shields.io/badge/Open%20in%20HACS-41BDF5?style=for-the-badge&logo=homeassistant&logoColor=white">
+  </a>
+  <a href="https://my.home-assistant.io/redirect/hacs_repository/?owner=alves-dev&repository=ai-usage&category=integration">
+    <img alt="Add as a custom repository" src="https://img.shields.io/badge/Add%20to%20HACS-18BC9C?style=for-the-badge&logo=github&logoColor=white">
+  </a>
+</p>
 
-- `codex`
-- `ollama_cloud`
+<p align="center">
+  <img alt="Home Assistant" src="https://img.shields.io/badge/Home%20Assistant-2026.4%2B-41BDF5?style=flat-square">
+  <img alt="HACS" src="https://img.shields.io/badge/HACS-Custom%20Integration-18BC9C?style=flat-square">
+  <img alt="Providers" src="https://img.shields.io/badge/Providers-Codex%20%7C%20Ollama%20Cloud-7C3AED?style=flat-square">
+</p>
 
-## What It Does
+## What It Is
 
-AI Usage is a webhook collector. It does not scrape provider pages by itself.
-Another source, such as a browser extension, shell script, or manual test, sends
-payloads to Home Assistant using the contract documented in
-[docs/payload-contract.md](docs/payload-contract.md).
+AI Usage is a custom Home Assistant integration that receives AI tool usage data
+and turns it into sensors.
 
-The integration then:
+It is designed for simple dashboard questions:
 
-1. Validates the payload envelope and provider-specific data.
-2. Separates ingestion errors from provider-reported errors.
-3. Resolves a stable account identity without using raw email in `unique_id`.
-4. Creates a parent diagnostic device for the webhook collector.
-5. Creates dynamic account devices for each observed provider account.
-6. Updates common account entities and provider-specific usage entities.
-7. Persists known accounts so dynamic devices return after reload/restart.
-8. Serves local provider images for `sensor.account.entity_picture`.
+- Can my account still use the service?
+- How much of the current limit has been used?
+- When does the limit reset?
+- Did a collector stop sending data?
+- How many AI accounts does Home Assistant know about?
 
-## Architecture
+The integration currently supports data from:
 
-```text
-Collector / script / extension
-        |
-        | POST /api/webhook/<webhook_id>
-        v
-Home Assistant webhook adapter
-        |
-        v
-AIUsageIngestionService
-        |
-        +--> payload validation
-        +--> provider validation
-        +--> account identity
-        +--> runtime state
-        +--> storage
-        +--> dispatcher updates
-        |
-        v
-Sensors and binary sensors
-```
+- Codex
+- Ollama Cloud
 
-The webhook is intentionally thin. Business logic lives in
-`AIUsageIngestionService`, so future collectors can call the same ingestion
-service without creating an artificial HTTP request.
+## How It Works
 
-## Devices
+AI Usage does not access your AI account directly and does not log in to external
+services. It works as an entry point inside Home Assistant.
 
-### Source Webhook
-
-The parent device represents the configured AI Usage webhook source.
-
-It contains integration-level diagnostics:
-
-| Entity | Purpose |
-| --- | --- |
-| `sensor.last_ingest_status` | Result of the last ingest attempt. |
-| `binary_sensor.webhook_problem` | On when the last ingest attempt failed. |
-| `sensor.last_webhook_received_at` | Timestamp when HA received the last webhook. |
-| `sensor.last_source` | Source of the last valid payload. |
-| `sensor.known_accounts` | Number of dynamic provider accounts known. |
-| `sensor.last_unscoped_error` | Last valid provider error that could not be tied to an account. |
-
-### Provider Account Devices
-
-Each identified account gets its own device:
+An external collector sends data to a Home Assistant webhook. The integration
+validates that data, identifies the account, and updates sensors that you can use
+in dashboards, automations, and alerts.
 
 ```text
-Codex codex.manual@example.com
-Ollama Cloud ollama.manual@example.com
+External collector -> Home Assistant webhook -> AI Usage -> Sensors
 ```
 
-Account devices are created dynamically when the first valid payload for that
-account arrives.
+This makes it possible to use different sources in the future, such as browser
+extensions, local scripts, or other small collectors.
 
-Common account entities:
+## What You See In Home Assistant
 
-| Entity | Purpose |
-| --- | --- |
-| `sensor.account` | Account label and provider image. |
-| `sensor.plan` | Plan type from `plan_data.type`. |
-| `sensor.status` | Provider status from the payload. |
-| `binary_sensor.problem` | On when provider status is not `ok`. |
-| `sensor.last_error` | Provider error code or `none`. |
-| `sensor.collected_at` | Timestamp collected by the source. |
-| `sensor.last_received_at` | Timestamp received by Home Assistant. |
-| `sensor.source` | Source name and source/schema versions. |
-| `sensor.request_count` | Count of accepted payloads for the account. |
+The integration creates one main device for the webhook and separate devices for
+each identified AI account.
 
-Provider-specific entities:
+The main device shows the overall collection state:
 
-| Provider | Entities |
-| --- | --- |
-| `codex` | Allowed, limit reached, primary/secondary window usage and reset sensors. |
-| `ollama_cloud` | Session and weekly usage percent/reset sensors. |
+- last received status
+- whether the webhook has a problem
+- when the last data arrived
+- last data source
+- number of known accounts
+- last error that was not tied to a specific account
 
-## Installation
+Each AI account shows sensors such as:
 
-Copy `custom_components/ai_usage` into your Home Assistant config directory:
+- account
+- plan
+- status
+- active problem
+- last error
+- collection time
+- Home Assistant receive time
+- data source
+- number of accepted samples
 
-```text
-config/custom_components/ai_usage
-```
+Provider-specific sensors also appear depending on the provider. For Codex, the
+integration shows rate-limit windows and reset times. For Ollama Cloud, it shows
+session usage and weekly usage.
 
-Restart Home Assistant, then add the integration:
+## HACS Installation
 
-```text
-Settings > Devices & services > Add Integration > AI Usage
-```
+If you have already added this repository to HACS, use:
 
-During setup, choose the `Webhook endpoint ID`.
+[![Open in HACS](https://img.shields.io/badge/Open%20AI%20Usage%20in%20HACS-41BDF5?style=for-the-badge&logo=homeassistant&logoColor=white)](/hacs/repository/1255408258)
 
-If the ID is:
+To add it as a custom repository:
+
+[![Add to HACS](https://img.shields.io/badge/Add%20Custom%20Repository-18BC9C?style=for-the-badge&logo=github&logoColor=white)](https://my.home-assistant.io/redirect/hacs_repository/?owner=alves-dev&repository=ai-usage&category=integration)
+
+Manual HACS setup:
+
+1. Open HACS.
+2. Go to **Integrations**.
+3. Open the three-dot menu.
+4. Choose **Custom repositories**.
+5. Add `https://github.com/alves-dev/ai-usage`.
+6. Select **Integration** as the category.
+7. Install **AI Usage**.
+8. Restart Home Assistant.
+
+## Configuration
+
+After installing and restarting:
+
+1. Open **Settings > Devices & services**.
+2. Click **Add Integration**.
+3. Search for **AI Usage**.
+4. Choose a **Webhook endpoint ID**.
+
+The ID becomes part of the webhook URL. If the ID is:
 
 ```text
 ia-tool-usage
 ```
 
-the webhook URL is:
+the URL will be:
 
 ```text
-http://localhost:8123/api/webhook/ia-tool-usage
+http://YOUR_HOME_ASSISTANT:8123/api/webhook/ia-tool-usage
 ```
 
-Treat the webhook ID like a secret. Use a long, non-obvious value for real
-deployments.
+Treat this ID as a secret. Use a long value that is hard to guess.
 
-## Payload Contract
+## After Configuration
 
-Every payload uses the same envelope:
+The integration only creates account sensors after it receives the first valid
+payload. If you just installed it and do not see Codex or Ollama Cloud sensors
+yet, that usually means no collector has sent data yet.
 
-```json
-{
-  "schema_version": "1.0",
-  "source": "manual_test",
-  "source_version": "0.1.0",
-  "collected_at": "2026-06-03T18:30:00.000Z",
-  "provider": "codex",
-  "status": "ok",
-  "account_data": {},
-  "plan_data": {},
-  "provider_data": {},
-  "error": null
-}
-```
+When the first valid sample arrives:
 
-See the full contract:
+- the account appears as a new device;
+- sensors are created automatically;
+- the account is saved so it comes back after restarting Home Assistant.
+
+## Privacy
+
+AI Usage is designed to avoid sensitive identifiers in internal sensor IDs.
+
+- Real email addresses are not used directly in `unique_id`.
+- Raw webhook payloads are not stored.
+- The webhook ID should be treated as a secret.
+- Examples and tests should use synthetic data.
+
+## Technical Documentation
+
+Technical details live outside the README so the HACS screen stays easier to
+read:
 
 - [Payload contract](docs/payload-contract.md)
 - [Device and sensor contract](docs/device-and-sensor-contract.md)
-- [Implementation spec](docs/implementation-spec.md)
+- [Generic provider contract](docs/generic-provider-contract.md)
+- [Stable account identity decision](docs/account-stable-id-decision.md)
+- [Implementation specification](docs/implementation-spec.md)
+- [Home Assistant compatibility](docs/compatibility.md)
 
-<details>
-<summary>Codex example payload</summary>
+## Development
 
-```json
-{
-  "schema_version": "1.0",
-  "source": "manual_test",
-  "source_version": "0.1.0",
-  "collected_at": "2026-06-03T18:30:00.000Z",
-  "provider": "codex",
-  "status": "ok",
-  "account_data": {
-    "user_id": "user-manual-codex",
-    "account_id": "acct-manual-codex",
-    "email": "codex.manual@example.com"
-  },
-  "plan_data": {
-    "type": "plus"
-  },
-  "provider_data": {
-    "rate_limit": {
-      "allowed": true,
-      "limit_reached": false,
-      "primary_window": {
-        "used_percent": 12.5,
-        "limit_window_seconds": 18000,
-        "reset_after_seconds": 14400,
-        "reset_at": 1780434415
-      },
-      "secondary_window": {
-        "used_percent": 37.2,
-        "limit_window_seconds": 604800,
-        "reset_after_seconds": 428946,
-        "reset_at": 1780846229
-      }
-    }
-  },
-  "error": null
-}
-```
-
-</details>
-
-<details>
-<summary>Ollama Cloud example payload</summary>
-
-```json
-{
-  "schema_version": "1.0",
-  "source": "manual_test",
-  "source_version": "0.1.0",
-  "collected_at": "2026-06-03T18:30:00.000Z",
-  "provider": "ollama_cloud",
-  "status": "ok",
-  "account_data": {
-    "username": "ollama-manual",
-    "email": "ollama.manual@example.com"
-  },
-  "plan_data": {
-    "type": "free"
-  },
-  "provider_data": {
-    "session_usage": {
-      "used_percent": 8.0,
-      "reset_at": "2026-06-03T22:00:00.000Z"
-    },
-    "weekly_usage": {
-      "used_percent": 44.4,
-      "reset_at": "2026-06-08T00:00:00.000Z"
-    }
-  },
-  "error": null
-}
-```
-
-</details>
-
-<details>
-<summary>Error payload without account identity</summary>
-
-This is a valid provider error payload, but because it has no account identity,
-it updates the parent device `sensor.last_unscoped_error` instead of creating an
-account device.
-
-```json
-{
-  "schema_version": "1.0",
-  "source": "manual_test",
-  "source_version": "0.1.0",
-  "collected_at": "2026-06-03T18:30:00.000Z",
-  "provider": "codex",
-  "status": "not_authenticated",
-  "account_data": {},
-  "plan_data": {},
-  "provider_data": {},
-  "error": {
-    "code": "not_authenticated",
-    "message": "Manual test: user is not logged in"
-  }
-}
-```
-
-</details>
-
-## Manual Webhook Calls
-
-Development scripts are available in `.dev/`:
+Main commands for contributors:
 
 ```bash
-.dev/call-error.sh
-.dev/call-codex.sh
-.dev/call-ollama.sh
-```
-
-By default they call:
-
-```text
-http://localhost:8123/api/webhook/ia-tool-usage
-```
-
-Override the URL with:
-
-```bash
-WEBHOOK_URL="http://localhost:8123/api/webhook/my-webhook-id" .dev/call-codex.sh
-```
-
-## Account Identity
-
-The integration never uses raw email, username, or display name in `unique_id`.
-
-Identity resolution order:
-
-1. `account_data.account_id`
-2. `account_data.user_id`
-3. hash of normalized provider email
-
-Account key format:
-
-```text
-acct_<sha256(provider:id_kind:id_value)[0:16]>
-```
-
-For `ollama_cloud`, email hash is currently the expected identity fallback
-because the source page does not expose a stable account ID.
-
-## Storage And Restore
-
-Known accounts are persisted with Home Assistant storage. The stored data is
-small metadata used to recreate dynamic devices after reload/restart.
-
-The integration does not persist raw payloads.
-
-Dynamic entities also use `RestoreEntity` where applicable, so the last known
-state can be shown before the next webhook sample arrives.
-
-## Local Development
-
-Install dependencies:
-
-```bash
-uv sync --all-groups
-```
-
-Run lint:
-
-```bash
-uv run ruff check custom_components/ai_usage tests
-```
-
-Run tests:
-
-```bash
+uv sync
 uv run pytest
+uv run ruff check .
+uv run ruff format .
+scripts/validate-homeassistant-version.sh
 ```
 
-Validate against a specific Home Assistant release in an isolated environment:
-
-```bash
-scripts/validate-homeassistant-version.sh 2026.5.0
-```
-
-When no version is provided, the script defaults to `2026.5.0`. Additional
-pytest arguments can be passed after the version:
-
-```bash
-scripts/validate-homeassistant-version.sh 2026.5.0 tests/test_ingestion.py
-```
-
-Copy the integration to a local Home Assistant Core checkout:
-
-```bash
-.dev/copy-to-core.sh
-```
-
-More local notes are in [docs/development.md](.dev/development.md).
-
-## GitHub Actions
-
-The workflow in `.github/workflows/tests.yml` runs on `main` pushes and pull
-requests:
-
-```bash
-uv sync --all-groups --frozen
-uv run ruff check custom_components/ai_usage tests
-uv run pytest
-```
-
-## Version Target
-
-The development environment pins:
-
-```toml
-homeassistant==2026.6.0
-```
-
-Compatibility checks can be run without changing that pin by using:
-
-```bash
-scripts/validate-homeassistant-version.sh 2026.5.0
-```
-
-The integration manifest currently has no Python package requirements because
-the runtime uses Home Assistant APIs and Python standard library modules only.
+Changes to payloads, sensors, or provider behavior should update the matching
+technical documentation in `docs/`.
