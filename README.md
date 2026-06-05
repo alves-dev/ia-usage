@@ -23,6 +23,21 @@
   <img alt="Providers" src="https://img.shields.io/badge/Providers-Codex%20%7C%20Ollama%20Cloud-7C3AED?style=flat-square">
 </p>
 
+<p align="center">
+  <a href="https://sonar.alves-dev.com/dashboard?id=ai-usage">
+    <img alt="Quality Gate Status" src="https://sonar.alves-dev.com/api/project_badges/measure?project=ai-usage&metric=alert_status&token=sqb_ebd6127a5ab8462ca0c48146a5f8ca2c10b90bb4">
+  </a>
+  <a href="https://sonar.alves-dev.com/dashboard?id=ai-usage">
+    <img alt="Coverage" src="https://sonar.alves-dev.com/api/project_badges/measure?project=ai-usage&metric=coverage&token=sqb_ebd6127a5ab8462ca0c48146a5f8ca2c10b90bb4">
+  </a>
+  <a href="https://sonar.alves-dev.com/dashboard?id=ai-usage">
+    <img alt="Reliability Issues" src="https://sonar.alves-dev.com/api/project_badges/measure?project=ai-usage&metric=software_quality_reliability_issues&token=sqb_ebd6127a5ab8462ca0c48146a5f8ca2c10b90bb4">
+  </a>
+  <a href="https://sonar.alves-dev.com/dashboard?id=ai-usage">
+    <img alt="Security Rating" src="https://sonar.alves-dev.com/api/project_badges/measure?project=ai-usage&metric=software_quality_security_rating&token=sqb_ebd6127a5ab8462ca0c48146a5f8ca2c10b90bb4">
+  </a>
+</p>
+
 ## What It Is
 
 AI Usage is a custom Home Assistant integration that receives AI tool usage data
