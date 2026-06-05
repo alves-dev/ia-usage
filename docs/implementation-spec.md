@@ -588,9 +588,9 @@ Entidades associadas:
 - `sensor.last_ingest_status`
 - `binary_sensor.webhook_problem`
 - `sensor.last_webhook_received_at`
-- `sensor.last_source`
+- `sensor.last_source` desabilitado por padrao
 - `sensor.known_accounts`
-- `sensor.last_unscoped_error`
+- `sensor.last_unscoped_error` desabilitado por padrao
 
 ### Device De Conta
 
@@ -855,6 +855,8 @@ Atributos:
 
 ### sensor.last_error
 
+Desabilitado por padrao.
+
 Estado:
 
 - `none` quando nao houver erro.
@@ -866,6 +868,8 @@ Atributos:
 - `status`
 
 ### sensor.collected_at
+
+Desabilitado por padrao.
 
 Estado:
 
@@ -881,6 +885,8 @@ Categoria:
 
 ### sensor.last_received_at
 
+Desabilitado por padrao.
+
 Estado:
 
 - timestamp em que o HA recebeu a request.
@@ -894,6 +900,8 @@ Categoria:
 - `diagnostic`
 
 ### sensor.source
+
+Desabilitado por padrao.
 
 Estado:
 
@@ -922,6 +930,8 @@ Categoria:
 - `diagnostic`
 
 ### sensor.request_count
+
+Desabilitado por padrao.
 
 Estado:
 
@@ -958,8 +968,10 @@ provider_data.rate_limit.allowed -> is_on
 Atributos:
 
 - `limit_reached`
-- `primary_window_used_percent`
-- `secondary_window_used_percent`
+- `five_hour_usage_used_percent`
+- `five_hour_usage_available_percent`
+- `weekly_usage_used_percent`
+- `weekly_usage_available_percent`
 
 ### binary_sensor.limit_reached
 
@@ -973,7 +985,7 @@ Device class:
 
 - `problem`
 
-### sensor.primary_window_used_percent
+### sensor.five_hour_usage_used_percent
 
 Mapeamento:
 
@@ -993,7 +1005,7 @@ Precisao sugerida:
 
 - 0 casas decimais.
 
-### sensor.primary_window_available_percent
+### sensor.five_hour_usage_available_percent
 
 Mapeamento:
 
@@ -1013,7 +1025,7 @@ Precisao sugerida:
 
 - 0 casas decimais.
 
-### sensor.primary_window_reset_at
+### sensor.five_hour_usage_reset_at
 
 Mapeamento:
 
@@ -1029,7 +1041,7 @@ Device class:
 
 - `timestamp`
 
-### sensor.primary_window_reset_after
+### sensor.five_hour_usage_reset_after
 
 Mapeamento:
 
@@ -1049,7 +1061,7 @@ Device class:
 
 - `duration`, quando disponivel.
 
-### sensor.secondary_window_used_percent
+### sensor.weekly_usage_used_percent
 
 Mapeamento:
 
@@ -1069,7 +1081,7 @@ Precisao sugerida:
 
 - 0 casas decimais.
 
-### sensor.secondary_window_available_percent
+### sensor.weekly_usage_available_percent
 
 Mapeamento:
 
@@ -1089,7 +1101,7 @@ Precisao sugerida:
 
 - 0 casas decimais.
 
-### sensor.secondary_window_reset_at
+### sensor.weekly_usage_reset_at
 
 Mapeamento:
 
@@ -1105,7 +1117,7 @@ Device class:
 
 - `timestamp`
 
-### sensor.secondary_window_reset_after
+### sensor.weekly_usage_reset_after
 
 Mapeamento:
 

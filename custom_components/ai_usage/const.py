@@ -81,14 +81,14 @@ COMMON_ACCOUNT_SENSOR_KEYS = (
 COMMON_ACCOUNT_BINARY_SENSOR_KEYS = ("problem",)
 
 CODEX_SENSOR_KEYS = (
-    "primary_window_used_percent",
-    "primary_window_available_percent",
-    "primary_window_reset_at",
-    "primary_window_reset_after",
-    "secondary_window_used_percent",
-    "secondary_window_available_percent",
-    "secondary_window_reset_at",
-    "secondary_window_reset_after",
+    "five_hour_usage_used_percent",
+    "five_hour_usage_available_percent",
+    "five_hour_usage_reset_at",
+    "five_hour_usage_reset_after",
+    "weekly_usage_used_percent",
+    "weekly_usage_available_percent",
+    "weekly_usage_reset_at",
+    "weekly_usage_reset_after",
 )
 CODEX_BINARY_SENSOR_KEYS = ("allowed", "limit_reached")
 

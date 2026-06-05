@@ -88,6 +88,7 @@ INTEGRATION_SENSOR_DESCRIPTIONS: tuple[AIUsageIntegrationSensorDescription, ...]
         name="Last source",
         icon="mdi:source-branch",
         entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
         device_class=SensorDeviceClass.ENUM,
         options=list(KNOWN_SOURCES),
         value_fn=lambda state: state.last_source,
@@ -116,6 +117,7 @@ INTEGRATION_SENSOR_DESCRIPTIONS: tuple[AIUsageIntegrationSensorDescription, ...]
         name="Last unscoped error",
         icon="mdi:alert-circle-outline",
         entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
         value_fn=lambda state: state.last_unscoped_error,
         attributes_fn=lambda state: _drop_none(
             {
@@ -169,6 +171,7 @@ COMMON_ACCOUNT_SENSOR_DESCRIPTIONS: tuple[AIUsageAccountSensorDescription, ...] 
         name="Last error",
         icon="mdi:alert-outline",
         entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
         value_fn=lambda state: (
             state.error.code
             if state.error is not None
@@ -186,6 +189,7 @@ COMMON_ACCOUNT_SENSOR_DESCRIPTIONS: tuple[AIUsageAccountSensorDescription, ...] 
         name="Collected at",
         icon="mdi:clock-edit-outline",
         entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
         device_class=SensorDeviceClass.TIMESTAMP,
         value_fn=lambda state: state.collected_at,
         attributes_fn=lambda state: _drop_none({"source": state.source}),
@@ -195,6 +199,7 @@ COMMON_ACCOUNT_SENSOR_DESCRIPTIONS: tuple[AIUsageAccountSensorDescription, ...] 
         name="Last received at",
         icon="mdi:clock-in",
         entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
         device_class=SensorDeviceClass.TIMESTAMP,
         value_fn=lambda state: state.last_received_at,
         attributes_fn=lambda state: _drop_none(
@@ -206,6 +211,7 @@ COMMON_ACCOUNT_SENSOR_DESCRIPTIONS: tuple[AIUsageAccountSensorDescription, ...] 
         name="Source",
         icon="mdi:cloud-upload-outline",
         entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
         device_class=SensorDeviceClass.ENUM,
         options=list(KNOWN_SOURCES),
         value_fn=lambda state: state.source,
@@ -220,6 +226,7 @@ COMMON_ACCOUNT_SENSOR_DESCRIPTIONS: tuple[AIUsageAccountSensorDescription, ...] 
         key="request_count",
         name="Request count",
         entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
         icon="mdi:counter",
         native_unit_of_measurement="requests",
         state_class=SensorStateClass.TOTAL_INCREASING,
@@ -231,8 +238,8 @@ COMMON_ACCOUNT_SENSOR_DESCRIPTIONS: tuple[AIUsageAccountSensorDescription, ...] 
 
 CODEX_SENSOR_DESCRIPTIONS: tuple[AIUsageAccountSensorDescription, ...] = (
     AIUsageAccountSensorDescription(
-        key="primary_window_used_percent",
-        name="Primary window used",
+        key="five_hour_usage_used_percent",
+        name="5-hour limit used",
         icon="mdi:gauge",
         native_unit_of_measurement=PERCENTAGE,
         state_class=SensorStateClass.MEASUREMENT,
@@ -245,8 +252,8 @@ CODEX_SENSOR_DESCRIPTIONS: tuple[AIUsageAccountSensorDescription, ...] = (
         attributes_fn=lambda state: _codex_used_attributes(state, "primary_window"),
     ),
     AIUsageAccountSensorDescription(
-        key="primary_window_available_percent",
-        name="Primary window available",
+        key="five_hour_usage_available_percent",
+        name="5-hour limit available",
         icon="mdi:gauge-empty",
         native_unit_of_measurement=PERCENTAGE,
         state_class=SensorStateClass.MEASUREMENT,
@@ -264,8 +271,8 @@ CODEX_SENSOR_DESCRIPTIONS: tuple[AIUsageAccountSensorDescription, ...] = (
         ),
     ),
     AIUsageAccountSensorDescription(
-        key="primary_window_reset_at",
-        name="Primary window reset at",
+        key="five_hour_usage_reset_at",
+        name="5-hour limit reset at",
         icon="mdi:calendar-clock",
         device_class=SensorDeviceClass.TIMESTAMP,
         value_fn=lambda state: _codex_window_datetime(
@@ -289,8 +296,8 @@ CODEX_SENSOR_DESCRIPTIONS: tuple[AIUsageAccountSensorDescription, ...] = (
         ),
     ),
     AIUsageAccountSensorDescription(
-        key="primary_window_reset_after",
-        name="Primary window reset after",
+        key="five_hour_usage_reset_after",
+        name="5-hour limit reset after",
         icon="mdi:timer-sand",
         device_class=SensorDeviceClass.DURATION,
         native_unit_of_measurement=UnitOfTime.HOURS,
@@ -314,8 +321,8 @@ CODEX_SENSOR_DESCRIPTIONS: tuple[AIUsageAccountSensorDescription, ...] = (
         ),
     ),
     AIUsageAccountSensorDescription(
-        key="secondary_window_used_percent",
-        name="Secondary window used",
+        key="weekly_usage_used_percent",
+        name="Weekly limit used",
         icon="mdi:gauge-low",
         native_unit_of_measurement=PERCENTAGE,
         state_class=SensorStateClass.MEASUREMENT,
@@ -328,8 +335,8 @@ CODEX_SENSOR_DESCRIPTIONS: tuple[AIUsageAccountSensorDescription, ...] = (
         attributes_fn=lambda state: _codex_used_attributes(state, "secondary_window"),
     ),
     AIUsageAccountSensorDescription(
-        key="secondary_window_available_percent",
-        name="Secondary window available",
+        key="weekly_usage_available_percent",
+        name="Weekly limit available",
         icon="mdi:gauge-empty",
         native_unit_of_measurement=PERCENTAGE,
         state_class=SensorStateClass.MEASUREMENT,
@@ -347,8 +354,8 @@ CODEX_SENSOR_DESCRIPTIONS: tuple[AIUsageAccountSensorDescription, ...] = (
         ),
     ),
     AIUsageAccountSensorDescription(
-        key="secondary_window_reset_at",
-        name="Secondary window reset at",
+        key="weekly_usage_reset_at",
+        name="Weekly limit reset at",
         icon="mdi:calendar-refresh-outline",
         device_class=SensorDeviceClass.TIMESTAMP,
         value_fn=lambda state: _codex_window_datetime(
@@ -372,8 +379,8 @@ CODEX_SENSOR_DESCRIPTIONS: tuple[AIUsageAccountSensorDescription, ...] = (
         ),
     ),
     AIUsageAccountSensorDescription(
-        key="secondary_window_reset_after",
-        name="Secondary window reset after",
+        key="weekly_usage_reset_after",
+        name="Weekly limit reset after",
         icon="mdi:timer-sand-complete",
         device_class=SensorDeviceClass.DURATION,
         native_unit_of_measurement=UnitOfTime.HOURS,
@@ -770,7 +777,7 @@ def _account_attributes(state: AccountState) -> dict[str, Any]:
 
 def _codex_used_attributes(state: AccountState, window_key: str) -> dict[str, Any]:
     """Return attributes for Codex used-percent sensors."""
-    window_label = "primary" if window_key == "primary_window" else "secondary"
+    window_label = "five_hour" if window_key == "primary_window" else "weekly"
     return _drop_none(
         {
             "window": window_label,
@@ -794,7 +801,7 @@ def _codex_available_attributes(
     window_key: str,
 ) -> dict[str, Any]:
     """Return attributes for Codex available-percent sensors."""
-    window_label = "primary" if window_key == "primary_window" else "secondary"
+    window_label = "five_hour" if window_key == "primary_window" else "weekly"
     return _drop_none(
         {
             "window": window_label,
