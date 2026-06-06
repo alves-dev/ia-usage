@@ -6,7 +6,7 @@ from homeassistant.const import Platform
 
 DOMAIN = "ai_usage"
 INTEGRATION_NAME = "AI Usage"
-INTEGRATION_VERSION = "0.0.1"
+INTEGRATION_VERSION = "0.0.2"
 
 CONF_WEBHOOK_ID = "webhook_id"
 
@@ -72,6 +72,7 @@ COMMON_ACCOUNT_SENSOR_KEYS = (
     "account",
     "plan",
     "status",
+    "last_sample_age",
     "last_error",
     "collected_at",
     "last_received_at",
@@ -81,19 +82,23 @@ COMMON_ACCOUNT_SENSOR_KEYS = (
 COMMON_ACCOUNT_BINARY_SENSOR_KEYS = ("problem",)
 
 CODEX_SENSOR_KEYS = (
-    "primary_window_used_percent",
-    "primary_window_reset_at",
-    "primary_window_reset_after",
-    "secondary_window_used_percent",
-    "secondary_window_reset_at",
-    "secondary_window_reset_after",
+    "five_hour_usage_used_percent",
+    "five_hour_usage_available_percent",
+    "five_hour_usage_reset_at",
+    "five_hour_usage_reset_after",
+    "weekly_usage_used_percent",
+    "weekly_usage_available_percent",
+    "weekly_usage_reset_at",
+    "weekly_usage_reset_after",
 )
 CODEX_BINARY_SENSOR_KEYS = ("allowed", "limit_reached")
 
 OLLAMA_CLOUD_SENSOR_KEYS = (
     "session_usage_used_percent",
+    "session_usage_available_percent",
     "session_usage_reset_at",
     "weekly_usage_used_percent",
+    "weekly_usage_available_percent",
     "weekly_usage_reset_at",
 )
 OLLAMA_CLOUD_BINARY_SENSOR_KEYS: tuple[str, ...] = ()

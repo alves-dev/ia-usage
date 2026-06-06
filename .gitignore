@@ -8,6 +8,7 @@ __pycache__/
 .pyre/
 .coverage
 .coverage.*
+coverage.xml
 htmlcov/
 
 # Virtual environments
@@ -21,4 +22,3 @@ env/
 # Local environment files
 .env
 .env.*
-

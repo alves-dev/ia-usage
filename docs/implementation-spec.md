@@ -588,9 +588,9 @@ Entidades associadas:
 - `sensor.last_ingest_status`
 - `binary_sensor.webhook_problem`
 - `sensor.last_webhook_received_at`
-- `sensor.last_source`
+- `sensor.last_source` desabilitado por padrao
 - `sensor.known_accounts`
-- `sensor.last_unscoped_error`
+- `sensor.last_unscoped_error` desabilitado por padrao
 
 ### Device De Conta
 
@@ -855,6 +855,8 @@ Atributos:
 
 ### sensor.last_error
 
+Desabilitado por padrao.
+
 Estado:
 
 - `none` quando nao houver erro.
@@ -866,6 +868,8 @@ Atributos:
 - `status`
 
 ### sensor.collected_at
+
+Desabilitado por padrao.
 
 Estado:
 
@@ -881,6 +885,8 @@ Categoria:
 
 ### sensor.last_received_at
 
+Desabilitado por padrao.
+
 Estado:
 
 - timestamp em que o HA recebeu a request.
@@ -893,7 +899,39 @@ Categoria:
 
 - `diagnostic`
 
+### sensor.last_sample_age
+
+Estado:
+
+- idade da ultima amostra da conta em minutos.
+
+Conversao:
+
+- `now() - last_received_at`
+
+Device class:
+
+- `duration`
+
+Unidade:
+
+- `min`
+
+State class:
+
+- `measurement`
+
+Atualizacao:
+
+- a cada 1 minuto enquanto a entidade existir.
+
+Categoria:
+
+- `diagnostic`
+
 ### sensor.source
+
+Desabilitado por padrao.
 
 Estado:
 
@@ -922,6 +960,8 @@ Categoria:
 - `diagnostic`
 
 ### sensor.request_count
+
+Desabilitado por padrao.
 
 Estado:
 
@@ -958,8 +998,10 @@ provider_data.rate_limit.allowed -> is_on
 Atributos:
 
 - `limit_reached`
-- `primary_window_used_percent`
-- `secondary_window_used_percent`
+- `five_hour_usage_used_percent`
+- `five_hour_usage_available_percent`
+- `weekly_usage_used_percent`
+- `weekly_usage_available_percent`
 
 ### binary_sensor.limit_reached
 
@@ -973,7 +1015,7 @@ Device class:
 
 - `problem`
 
-### sensor.primary_window_used_percent
+### sensor.five_hour_usage_used_percent
 
 Mapeamento:
 
@@ -991,9 +1033,29 @@ State class:
 
 Precisao sugerida:
 
-- 1 casa decimal.
+- 0 casas decimais.
 
-### sensor.primary_window_reset_at
+### sensor.five_hour_usage_available_percent
+
+Mapeamento:
+
+```text
+100 - provider_data.rate_limit.primary_window.used_percent
+```
+
+Unidade:
+
+- `%`
+
+State class:
+
+- `measurement`
+
+Precisao sugerida:
+
+- 0 casas decimais.
+
+### sensor.five_hour_usage_reset_at
 
 Mapeamento:
 
@@ -1009,7 +1071,7 @@ Device class:
 
 - `timestamp`
 
-### sensor.primary_window_reset_after
+### sensor.five_hour_usage_reset_after
 
 Mapeamento:
 
@@ -1017,15 +1079,19 @@ Mapeamento:
 provider_data.rate_limit.primary_window.reset_after_seconds
 ```
 
+Conversao:
+
+- segundos do payload para horas no estado da entidade.
+
 Unidade:
 
-- `s`
+- `h`
 
 Device class:
 
 - `duration`, quando disponivel.
 
-### sensor.secondary_window_used_percent
+### sensor.weekly_usage_used_percent
 
 Mapeamento:
 
@@ -1043,9 +1109,29 @@ State class:
 
 Precisao sugerida:
 
-- 1 casa decimal.
+- 0 casas decimais.
 
-### sensor.secondary_window_reset_at
+### sensor.weekly_usage_available_percent
+
+Mapeamento:
+
+```text
+100 - provider_data.rate_limit.secondary_window.used_percent
+```
+
+Unidade:
+
+- `%`
+
+State class:
+
+- `measurement`
+
+Precisao sugerida:
+
+- 0 casas decimais.
+
+### sensor.weekly_usage_reset_at
 
 Mapeamento:
 
@@ -1061,7 +1147,7 @@ Device class:
 
 - `timestamp`
 
-### sensor.secondary_window_reset_after
+### sensor.weekly_usage_reset_after
 
 Mapeamento:
 
@@ -1069,9 +1155,13 @@ Mapeamento:
 provider_data.rate_limit.secondary_window.reset_after_seconds
 ```
 
+Conversao:
+
+- segundos do payload para horas no estado da entidade.
+
 Unidade:
 
-- `s`
+- `h`
 
 Device class:
 
@@ -1104,7 +1194,27 @@ State class:
 
 Precisao sugerida:
 
-- 1 casa decimal.
+- 0 casas decimais.
+
+### sensor.session_usage_available_percent
+
+Mapeamento:
+
+```text
+100 - provider_data.session_usage.used_percent
+```
+
+Unidade:
+
+- `%`
+
+State class:
+
+- `measurement`
+
+Precisao sugerida:
+
+- 0 casas decimais.
 
 ### sensor.session_usage_reset_at
 
@@ -1140,7 +1250,27 @@ State class:
 
 Precisao sugerida:
 
-- 1 casa decimal.
+- 0 casas decimais.
+
+### sensor.weekly_usage_available_percent
+
+Mapeamento:
+
+```text
+100 - provider_data.weekly_usage.used_percent
+```
+
+Unidade:
+
+- `%`
+
+State class:
+
+- `measurement`
+
+Precisao sugerida:
+
+- 0 casas decimais.
 
 ### sensor.weekly_usage_reset_at
 
@@ -1400,7 +1530,7 @@ Cenarios:
 - `limit_reached` reflete `rate_limit.limit_reached`.
 - Percentuais das janelas sao numericos.
 - `reset_at` Unix epoch vira `datetime` UTC.
-- `reset_after_seconds` vira duracao em segundos.
+- `reset_after_seconds` vira duracao em horas.
 - Campo ausente deixa entidade como `unknown`, sem quebrar webhook valido se o
   contrato permitir ausencia.
 

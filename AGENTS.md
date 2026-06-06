@@ -12,6 +12,13 @@ assets are stored under `custom_components/ai_usage/brand/` and
 Tests live in `tests/` and documentation lives in `docs/`. Keep payload and
 sensor contract changes aligned with the relevant files in `docs/`.
 
+Keep `CHANGELOG.md` updated for every user-visible behavior change, entity
+contract change, provider change, compatibility change, or release preparation.
+When changing the integration version, update every version source in the same
+change, including `custom_components/ai_usage/const.py`,
+`custom_components/ai_usage/manifest.json`, docs, badges, and changelog entries
+when applicable.
+
 ## Build, Test, and Development Commands
 
 - `uv sync` installs the pinned runtime and development dependencies.

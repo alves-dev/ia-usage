@@ -23,10 +23,29 @@
   <img alt="Providers" src="https://img.shields.io/badge/Providers-Codex%20%7C%20Ollama%20Cloud-7C3AED?style=flat-square">
 </p>
 
+<p align="center">
+  <a href="https://sonar.alves-dev.com/dashboard?id=ai-usage">
+    <img alt="Quality Gate Status" src="https://sonar.alves-dev.com/api/project_badges/measure?project=ai-usage&metric=alert_status&token=sqb_ebd6127a5ab8462ca0c48146a5f8ca2c10b90bb4">
+  </a>
+  <a href="https://sonar.alves-dev.com/dashboard?id=ai-usage">
+    <img alt="Coverage" src="https://sonar.alves-dev.com/api/project_badges/measure?project=ai-usage&metric=coverage&token=sqb_ebd6127a5ab8462ca0c48146a5f8ca2c10b90bb4">
+  </a>
+  <a href="https://sonar.alves-dev.com/dashboard?id=ai-usage">
+    <img alt="Reliability Issues" src="https://sonar.alves-dev.com/api/project_badges/measure?project=ai-usage&metric=software_quality_reliability_issues&token=sqb_ebd6127a5ab8462ca0c48146a5f8ca2c10b90bb4">
+  </a>
+  <a href="https://sonar.alves-dev.com/dashboard?id=ai-usage">
+    <img alt="Security Rating" src="https://sonar.alves-dev.com/api/project_badges/measure?project=ai-usage&metric=software_quality_security_rating&token=sqb_ebd6127a5ab8462ca0c48146a5f8ca2c10b90bb4">
+  </a>
+</p>
+
 ## What It Is
 
 AI Usage is a custom Home Assistant integration that receives AI tool usage data
 and turns it into sensors.
+
+> [!IMPORTANT]
+> AI Usage is still beta until it reaches `v1.0.0`. Entity names, attributes,
+> and provider-specific sensors may change before the stable release.
 
 It is designed for simple dashboard questions:
 
@@ -55,37 +74,82 @@ External collector -> Home Assistant webhook -> AI Usage -> Sensors
 ```
 
 This makes it possible to use different sources in the future, such as browser
-extensions, local scripts, or other small collectors.
+extensions, local scripts, or other small collectors. If you want a ready-made
+option, you can use the browser extension at
+https://github.com/alves-dev/ai-usage-extension or implement your own collector.
 
 ## What You See In Home Assistant
 
 The integration creates one main device for the webhook and separate devices for
 each identified AI account.
 
-The main device shows the overall collection state:
+### Main Webhook Device
 
-- last received status
-- whether the webhook has a problem
-- when the last data arrived
-- last data source
-- number of known accounts
-- last error that was not tied to a specific account
+| Entity                            | Type          | What it shows                                                                                                      |
+|-----------------------------------|---------------|--------------------------------------------------------------------------------------------------------------------|
+| `sensor.last_ingest_status`       | Sensor        | Result of the last webhook request handled by Home Assistant, such as `ok`, `invalid_json`, or `invalid_contract`. |
+| `binary_sensor.webhook_problem`   | Binary sensor | Turns on when the last webhook request failed validation or ingestion.                                             |
+| `sensor.last_webhook_received_at` | Sensor        | When Home Assistant received the latest webhook request.                                                           |
+| `sensor.last_source`              | Sensor        | Collector source of the latest valid payload, such as `browser_extension` or `python_collector`. Disabled by default. |
+| `sensor.known_accounts`           | Sensor        | Number of AI accounts currently known by the integration.                                                          |
+| `sensor.last_unscoped_error`      | Sensor        | Last provider error that could not be tied to a specific account. Disabled by default.                             |
 
-Each AI account shows sensors such as:
+### Account Devices
 
-- account
-- plan
-- status
-- active problem
-- last error
-- collection time
-- Home Assistant receive time
-- data source
-- number of accepted samples
+| Entity                    | Type          | What it shows                                                                                                                                                                                |
+|---------------------------|---------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `sensor.account`          | Sensor        | Account label and account metadata, using the best available identifier from the payload.                                                                                                    |
+| `sensor.plan`             | Sensor        | Account plan from `plan_data.type`, such as `free`, `plus`, or `pro`. This is a normal account sensor, not a diagnostic-only sensor, because it can be useful in dashboards and automations. |
+| `sensor.status`           | Sensor        | Provider status for the latest account sample, such as `ok`, `not_authenticated`, `rate_limited`, or `provider_unavailable`.                                                                 |
+| `binary_sensor.problem`   | Binary sensor | Turns on when `sensor.status` is not `ok`.                                                                                                                                                   |
+| `sensor.last_sample_age`  | Sensor        | Age of the last sample received for that account, in minutes. Helps detect stale data even when the last status was `ok`.                                                                      |
+| `sensor.last_error`       | Sensor        | Last provider error code for the account, or `none` when the latest sample has no error. Disabled by default.                                                                                |
+| `sensor.collected_at`     | Sensor        | When the external collector read the usage data from the provider. Disabled by default.                                                                                                      |
+| `sensor.last_received_at` | Sensor        | When Home Assistant received that account sample. Disabled by default. Enable it to compare with `collected_at` for collector delay, queueing, or stale data.                                |
+| `sensor.source`           | Sensor        | Source that produced the account payload. Disabled by default.                                                                                                                               |
+| `sensor.request_count`    | Sensor        | Number of accepted samples received for that account. Disabled by default.                                                                                                                   |
 
-Provider-specific sensors also appear depending on the provider. For Codex, the
-integration shows rate-limit windows and reset times. For Ollama Cloud, it shows
-session usage and weekly usage.
+### Codex Account Sensors
+
+| Entity                                      | Type          | What it shows                                                                                                                                                                                                                                           |
+|---------------------------------------------|---------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `binary_sensor.allowed`                     | Binary sensor | Whether Codex currently allows new usage according to the rate-limit data. This is different from `sensor.status`: status says whether the account sample was collected successfully; allowed says whether usage is permitted inside that valid sample. |
+| `binary_sensor.limit_reached`               | Binary sensor | Whether Codex reports that the account has reached a usage limit.                                                                                                                                                                                       |
+| `sensor.five_hour_usage_used_percent`       | Sensor        | Percent used in the Codex 5-hour usage limit, displayed without decimal places.                                                                                                                                                                         |
+| `sensor.five_hour_usage_available_percent`  | Sensor        | Percent still available in the Codex 5-hour usage limit.                                                                                                                                                                                                |
+| `sensor.five_hour_usage_reset_at`           | Sensor        | Timestamp when the Codex 5-hour usage limit resets.                                                                                                                                                                                                     |
+| `sensor.five_hour_usage_reset_after`        | Sensor        | Duration until the Codex 5-hour usage limit resets, shown in hours instead of raw seconds.                                                                                                                                                              |
+| `sensor.weekly_usage_used_percent`          | Sensor        | Percent used in the Codex weekly usage limit, displayed without decimal places.                                                                                                                                                                         |
+| `sensor.weekly_usage_available_percent`     | Sensor        | Percent still available in the Codex weekly usage limit.                                                                                                                                                                                                |
+| `sensor.weekly_usage_reset_at`              | Sensor        | Timestamp when the Codex weekly usage limit resets.                                                                                                                                                                                                     |
+| `sensor.weekly_usage_reset_after`           | Sensor        | Duration until the Codex weekly usage limit resets, shown in hours instead of raw seconds.                                                                                                                                                              |
+
+### Ollama Cloud Account Sensors
+
+| Entity                                   | Type   | What it shows                                                                              |
+|------------------------------------------|--------|--------------------------------------------------------------------------------------------|
+| `sensor.session_usage_used_percent`      | Sensor | Percent used in the current Ollama Cloud session window, displayed without decimal places. |
+| `sensor.session_usage_available_percent` | Sensor | Percent still available in the current Ollama Cloud session window.                        |
+| `sensor.session_usage_reset_at`          | Sensor | Timestamp when the Ollama Cloud session usage resets.                                      |
+| `sensor.weekly_usage_used_percent`       | Sensor | Percent used in the current Ollama Cloud weekly window, displayed without decimal places.  |
+| `sensor.weekly_usage_available_percent`  | Sensor | Percent still available in the current Ollama Cloud weekly window.                         |
+| `sensor.weekly_usage_reset_at`           | Sensor | Timestamp when the Ollama Cloud weekly usage resets.                                       |
+
+### Status And Limit Signals
+
+| Entity                        | Scope          | Use it for                    | Meaning                                                                                                                                      |
+|-------------------------------|----------------|-------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------|
+| `sensor.last_ingest_status`   | Webhook        | Collector and webhook health  | Whether Home Assistant accepted the last webhook request. This can fail even when the provider account itself is fine.                       |
+| `sensor.status`               | Account        | Provider sample health        | Whether the latest account sample was collected successfully from the provider. `ok` means the payload is valid and provider data is usable. |
+| `binary_sensor.problem`       | Account        | Account-level alerts          | Turns on when `sensor.status` is not `ok`. Use this for provider/account errors such as authentication or rate-limit failures.               |
+| `binary_sensor.allowed`       | Codex account  | Usage availability            | Whether Codex currently allows new usage according to the latest rate-limit sample. This is separate from `sensor.status`.                   |
+| `binary_sensor.limit_reached` | Codex account  | Limit alerts                  | Whether Codex reports that a usage limit has been reached.                                                                                   |
+| `sensor.*_used_percent`       | Account window | Usage dashboards              | How much of a usage window has already been consumed.                                                                                        |
+| `sensor.*_available_percent`  | Account window | Remaining capacity dashboards | How much of a usage window is still available.                                                                                               |
+
+Some diagnostic entities are disabled by default to keep new installations
+focused on operational sensors. Enable them manually in Home Assistant when you
+need collector/source debugging, raw receive timestamps, or request counters.
 
 ## HACS Installation
 
@@ -163,6 +227,7 @@ read:
 - [Stable account identity decision](docs/account-stable-id-decision.md)
 - [Implementation specification](docs/implementation-spec.md)
 - [Home Assistant compatibility](docs/compatibility.md)
+- [Changelog](CHANGELOG.md)
 
 ## Development
 

@@ -1,11 +1,7 @@
 # TODO
 
-- [x] definir contratos para cada provider
-- [ ] definir sensores para cada provider
-- [ ] devices service devem ser criados dinamicamente quando receber a request 
-- [ ] o device info deve ter source e source version 
-- [ ] Posso ter múltiplos contas para o mesmo provider, o que vai gerar sensores diferentes
-- [ ] Criar uma entidade que mostre a imagem do provider e os dados da conta ? Email, id, etc, plano]
+- [ ] Pensar em nomes finais antes da v1
+     Agora é a hora de ajustar entity keys. Depois da v1.0.0, mudar primary_window_available_percent ou last_received_at vai quebrar dashboards/automações]
 - [ ] Verificar a template: https://github.com/nikolajflojgaard/homeassistant-hacs-template
 - [ ] run ruff check custom_components/ai_usage em pipeline
 ---

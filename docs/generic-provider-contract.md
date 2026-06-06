@@ -267,7 +267,7 @@ Formato:
   "state_class": "measurement",
   "entity_category": null,
   "icon": "mdi:gauge",
-  "suggested_display_precision": 1,
+  "suggested_display_precision": 0,
   "attributes": {
     "window": "daily"
   }
@@ -659,7 +659,7 @@ name: "Daily usage used"
 native_value: 42.5
 native_unit_of_measurement: "%"
 state_class: measurement
-suggested_display_precision: 1
+suggested_display_precision: 0
 attributes:
   window: daily
 ```

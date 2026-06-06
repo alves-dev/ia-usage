@@ -104,15 +104,29 @@ CODEX_BINARY_SENSOR_DESCRIPTIONS: tuple[AIUsageAccountBinarySensorDescription, .
         attributes_fn=lambda state: _drop_none(
             {
                 "limit_reached": _codex_rate_limit_bool(state, "limit_reached"),
-                "primary_window_used_percent": _codex_window_number(
+                "five_hour_usage_used_percent": _codex_window_number(
                     state,
                     "primary_window",
                     "used_percent",
                 ),
-                "secondary_window_used_percent": _codex_window_number(
+                "five_hour_usage_available_percent": _available_percent(
+                    _codex_window_number(
+                        state,
+                        "primary_window",
+                        "used_percent",
+                    )
+                ),
+                "weekly_usage_used_percent": _codex_window_number(
                     state,
                     "secondary_window",
                     "used_percent",
+                ),
+                "weekly_usage_available_percent": _available_percent(
+                    _codex_window_number(
+                        state,
+                        "secondary_window",
+                        "used_percent",
+                    )
                 ),
             }
         ),
@@ -373,6 +387,13 @@ def _codex_window_number(
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         return None
     return value
+
+
+def _available_percent(used_percent: int | float | None) -> float | None:
+    """Return available percentage derived from a used percentage."""
+    if used_percent is None:
+        return None
+    return max(0.0, min(100.0, 100.0 - float(used_percent)))
 
 
 def _nested_value(data: dict[str, Any], *path: str) -> Any:

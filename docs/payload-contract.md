@@ -201,7 +201,8 @@ Observacoes:
 
 - `reset_at` dentro de `rate_limit` usa Unix epoch seconds, conforme retornado pelo Codex.
 - `used_percent` e numerico e representa percentual ja usado na janela.
-- `primary_window` e `secondary_window` sao janelas do provider; a integracao deve tratar o significado delas como especifico do Codex.
+- `primary_window` e a janela do limite de 5 horas do Codex.
+- `secondary_window` e a janela do limite semanal do Codex.
 
 ### Exemplo Codex
 
