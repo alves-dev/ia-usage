@@ -6,7 +6,7 @@ from homeassistant.const import Platform
 
 DOMAIN = "ai_usage"
 INTEGRATION_NAME = "AI Usage"
-INTEGRATION_VERSION = "0.0.1"
+INTEGRATION_VERSION = "0.0.2"
 
 CONF_WEBHOOK_ID = "webhook_id"
 
@@ -72,6 +72,7 @@ COMMON_ACCOUNT_SENSOR_KEYS = (
     "account",
     "plan",
     "status",
+    "last_sample_age",
     "last_error",
     "collected_at",
     "last_received_at",

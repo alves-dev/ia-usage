@@ -325,6 +325,7 @@ provider.
 | `plan` | `sensor` | tipo do plano | enum quando houver opcoes conhecidas | nenhuma | `plus` |
 | `status` | `sensor` | status do payload | enum | nenhuma | `ok` |
 | `problem` | `binary_sensor` | erro ativo | problem | diagnostic | `off` |
+| `last_sample_age` | `sensor` | idade da ultima amostra da conta | duration | `min` | `30` |
 | `last_error` | `sensor` | `none` ou codigo de erro | enum ou nenhuma | diagnostic | `none` |
 | `collected_at` | `sensor` | timestamp da coleta | timestamp | diagnostic | `2026-06-02T15:40:00+00:00` |
 | `last_received_at` | `sensor` | timestamp recebido pelo HA | timestamp | diagnostic | `2026-06-02T15:40:01+00:00` |
@@ -540,6 +541,30 @@ name: "Last received at"
 device_class: timestamp
 native_value: "2026-06-02T15:40:01+00:00"
 attributes:
+  collected_at: "2026-06-02T15:40:00+00:00"
+```
+
+### `sensor.last_sample_age`
+
+Representa ha quanto tempo a ultima amostra da conta foi recebida pelo Home
+Assistant. A unidade e minutos, e a entidade deve atualizar periodicamente
+para mostrar o envelhecimento do dado mesmo sem novos webhooks.
+
+Exemplo:
+
+```yaml
+platform: sensor
+unique_id: "<device_key>:last_sample_age"
+device: "AI Usage Codex user@example.com"
+has_entity_name: true
+name: "Last sample age"
+device_class: duration
+native_unit_of_measurement: "min"
+state_class: measurement
+suggested_display_precision: 1
+native_value: 30
+attributes:
+  last_received_at: "2026-06-02T15:40:01+00:00"
   collected_at: "2026-06-02T15:40:00+00:00"
 ```
 

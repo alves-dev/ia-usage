@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from homeassistant.components.sensor import (
@@ -20,6 +20,7 @@ from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.restore_state import RestoreEntity
 
 from .const import (
@@ -163,6 +164,23 @@ COMMON_ACCOUNT_SENSOR_DESCRIPTIONS: tuple[AIUsageAccountSensorDescription, ...] 
                 "provider": state.provider,
                 "collected_at": _iso(state.collected_at),
                 "last_received_at": _iso(state.last_received_at),
+            }
+        ),
+    ),
+    AIUsageAccountSensorDescription(
+        key="last_sample_age",
+        name="Last sample age",
+        icon="mdi:timer-outline",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        device_class=SensorDeviceClass.DURATION,
+        native_unit_of_measurement=UnitOfTime.MINUTES,
+        state_class=SensorStateClass.MEASUREMENT,
+        suggested_display_precision=1,
+        value_fn=lambda state: _last_sample_age_minutes(state.last_received_at),
+        attributes_fn=lambda state: _drop_none(
+            {
+                "last_received_at": _iso(state.last_received_at),
+                "collected_at": _iso(state.collected_at),
             }
         ),
     ),
@@ -637,6 +655,7 @@ class AIUsageAccountSensor(SensorEntity, RestoreEntity):
         self._account_key = account.account_key
         self._restored_native_value: Any = None
         self._restored_attributes: dict[str, Any] | None = None
+        self._age_update_remove = None
         self._attr_unique_id = (
             f"{entry.entry_id}:{account.provider}:{account.account_key}:"
             f"{description.key}"
@@ -657,6 +676,8 @@ class AIUsageAccountSensor(SensorEntity, RestoreEntity):
     @property
     def native_value(self) -> Any:
         """Return the current sensor value."""
+        if self.entity_description.key == "last_sample_age":
+            return self.entity_description.value_fn(self._state)
         value = self.entity_description.value_fn(self._state)
         if value is None and not self._state.has_sample:
             return self._restored_native_value
@@ -665,6 +686,9 @@ class AIUsageAccountSensor(SensorEntity, RestoreEntity):
     @property
     def extra_state_attributes(self) -> dict[str, Any] | None:
         """Return extra attributes for the sensor."""
+        if self.entity_description.key == "last_sample_age":
+            attributes = self.entity_description.attributes_fn(self._state)
+            return attributes or None
         attributes = self.entity_description.attributes_fn(self._state)
         if attributes:
             return attributes
@@ -687,6 +711,14 @@ class AIUsageAccountSensor(SensorEntity, RestoreEntity):
                     last_state.state,
                 )
                 self._restored_attributes = dict(last_state.attributes)
+
+        if self.entity_description.key == "last_sample_age":
+            self._age_update_remove = async_track_time_interval(
+                self.hass,
+                self._handle_update,
+                timedelta(minutes=1),
+            )
+            self.async_on_remove(self._age_update_remove)
 
         self.async_on_remove(
             async_dispatcher_connect(
@@ -850,6 +882,16 @@ def _available_percent(used_percent: int | float | None) -> float | None:
     if used_percent is None:
         return None
     return max(0.0, min(100.0, 100.0 - float(used_percent)))
+
+
+def _last_sample_age_minutes(received_at: datetime | None) -> float | None:
+    """Return the age of the last sample in minutes."""
+    if received_at is None:
+        return None
+    age_seconds = (datetime.now(UTC) - received_at).total_seconds()
+    if age_seconds < 0:
+        return 0.0
+    return round(age_seconds / 60, 1)
 
 
 def _codex_window_number(

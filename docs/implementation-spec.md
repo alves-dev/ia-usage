@@ -899,6 +899,36 @@ Categoria:
 
 - `diagnostic`
 
+### sensor.last_sample_age
+
+Estado:
+
+- idade da ultima amostra da conta em minutos.
+
+Conversao:
+
+- `now() - last_received_at`
+
+Device class:
+
+- `duration`
+
+Unidade:
+
+- `min`
+
+State class:
+
+- `measurement`
+
+Atualizacao:
+
+- a cada 1 minuto enquanto a entidade existir.
+
+Categoria:
+
+- `diagnostic`
+
 ### sensor.source
 
 Desabilitado por padrao.

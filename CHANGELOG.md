@@ -10,6 +10,7 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 ### Added
 
 - Added available percentage sensors for Codex and Ollama Cloud usage windows.
+- Added `sensor.last_sample_age` for account staleness tracking.
 - Added README tables explaining Home Assistant entities and status/limit
   signals.
 
